@@ -1,0 +1,21 @@
+{
+  "name": "tg",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "tsc && node dist/index.js"
+  },
+  "dependencies": {
+    "@google/genai": "^1.41.0",
+    "@types/node": "^25.2.3",
+    "prompts": "^2.4.2",
+    "telegram": "^2.26.22"
+  },
+  "devDependencies": {
+    "@types/prompts": "^2.4.9",
+    "typescript": "^5.5.3"
+  },
+  "private": true
+}

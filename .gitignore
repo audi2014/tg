@@ -1,0 +1,4 @@
+src/secrets.ts
+tg-session.txt
+dist
+node_modules
