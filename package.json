@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "start": "tsc && node --env-file .env dist/index.js",
-    "start-local": "tsc && node dist/index.js"
+    "start-ci": "tsc && node dist/index.js"
   },
   "dependencies": {
     "@google/genai": "^1.41.0",
