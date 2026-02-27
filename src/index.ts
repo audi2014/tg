@@ -2,15 +2,16 @@ import {Api, TelegramClient} from "telegram";
 import {StringSession} from "telegram/sessions";
 import prompts from "prompts";
 import {GoogleGenAI} from "@google/genai";
-import {GOOGLE_API_KEY, TG_API_HASH, TG_API_ID, TG_INVITE_HASH} from "./secrets";
+import {GOOGLE_API_KEY, TG_API_HASH, TG_API_ID, TG_INVITE_HASH, TG_SESSION} from "./secrets";
 import fs from 'node:fs'
 import type {EntityLike} from "telegram/define";
 
 const SESSION_FILE = 'tg-session.txt';
-const reedTgSession = () => fs.existsSync(SESSION_FILE) ? fs.readFileSync(SESSION_FILE, 'utf8') : undefined;
-const writeTgSession = (txt: string) => fs.writeFileSync(SESSION_FILE, txt);
+const readLocalSession = () => fs.existsSync(SESSION_FILE) ? fs.readFileSync(SESSION_FILE, 'utf8') : undefined;
+const writeLocalSession = (txt: string) => fs.writeFileSync(SESSION_FILE, txt);
 
-const stringSession = new StringSession(reedTgSession());
+const resolvedSession = TG_SESSION || readLocalSession() || '';
+const stringSession = new StringSession(resolvedSession);
 
 const ai = new GoogleGenAI({
     apiKey: GOOGLE_API_KEY
@@ -114,8 +115,12 @@ async function init(client: TelegramClient) {
     const client = new TelegramClient(stringSession, TG_API_ID, TG_API_HASH, {
         connectionRetries: 5,
     });
-    await init(client);
-    writeTgSession(client.session.save() as unknown as string);
+    if (!resolvedSession) {
+        await init(client);
+        writeLocalSession(client.session.save() as unknown as string);
+    } else {
+        await client.connect();
+    }
     const chatEntity = await retrieveChatEntity(client);
     const messages = await fetchMessages(client, chatEntity);
     const history = (await Promise.all(messages.map(messageToString))).reverse().join("\n")
